@@ -1,3 +1,6 @@
+import string
+import os
+
 import logic
 from conf import Message, APP
 
@@ -16,11 +19,14 @@ def clock_out():
     print("Goodbye!")
 
 
-def apply_off():
+def apply_off(self, dates):
     print("I\'m applying off !")
-    sbj, msg = logic.get_message(Message.OFF)
+    sbj, origin_msg = logic.get_message(Message.OFF)
+    boss = os.environ["CLOCKIN_BOSS"]
+    me = os.environ["CLOCKIN_ME"]
+    term = ",".join(dates)
+    msg = string.Template(origin_msg).safe_substitute({"boss": boss, "me": me, "term": term})
     logic.send_email(sbj, msg)
-    print("applied!")
 
 
 def change_app(self, app):
@@ -28,4 +34,6 @@ def change_app(self, app):
         case APP.MAIN:
             self.frame.tkraise()
         case APP.OFF:
+            self.frame_applyoff.tkraise()
+        case APP.CHECK:
             self.frame_applyoff.tkraise()
