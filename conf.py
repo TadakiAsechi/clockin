@@ -18,7 +18,7 @@ class Email:
 class APP(enum.Enum):
     MAIN = 0
     OFF = 1
-
+    CHECK = 2
 
 class Message(enum.Enum):
     IN = 1

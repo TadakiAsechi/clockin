@@ -76,8 +76,8 @@ def get_message(msg_type):
             sbj = "退勤しました！"
             msg = "退勤しましたよ！"
         case Message.OFF:
-            sbj = "有給申請したいです！"
-            msg = "${boss}部長\nお疲れ様です。${me}です。\n\n${term} に有給休暇を取得させていただきたく思います。" \
+            sbj = "有給申請_${me}"
+            msg = "${boss}部長\n\nお疲れ様です。${me}です。\n\n以下の日程で有給休暇を取得させていただきたく思います\n\n${term} \n" \
                   "\n先方にも確認済みで、前後での業務の引き継ぎやフォローなどはしっかり行おうと思います。\n\n以上、ご査証のほどよろしくお願いいたします。\n\n${me}"
         case _:
             raise ValueError("引数はEnum型Messageから選んでください。")
