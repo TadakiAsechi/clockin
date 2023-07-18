@@ -1,46 +1,73 @@
+# coding: utf-8
+
 import string
 import os
+
+from tkinter import messagebox
 
 import logic
 from conf import Message, APP
 
 
-def clock_in():
+def clock_in(self):
     print("you're in!")
-    sbj, msg = logic.get_message(Message.IN)
-    logic.send_email(sbj, msg)
+    origin_sbj, origin_msg = logic.get_message(Message.IN)
+
+    # メッセージに文言を埋め込む
+    self.mail_sbj = string.Template(origin_sbj).safe_substitute({"me": self.me})
+    self.mail_msg = string.Template(origin_msg).safe_substitute({"boss": self.boss, "me": self.me})
+
     print("done!")
 
 
-def clock_out():
+def clock_out(self):
     print("you are out!")
-    sbj, msg = logic.get_message(Message.OUT)
-    logic.send_email(sbj, msg)
+    origin_sbj, origin_msg = logic.get_message(Message.OUT)
+
+    # メッセージに文言を埋め込む
+    self.mail_sbj = string.Template(origin_sbj).safe_substitute({"me": self.me})
+    self.mail_msg = string.Template(origin_msg).safe_substitute({"boss": self.boss, "me": self.me})
+
     print("Goodbye!")
 
 
 def apply_off(self, dates):
-    print("I\'m applying off !")
+    # メッセージに埋め込む文言を準備
     origin_sbj, origin_msg = logic.get_message(Message.OFF)
-    boss = os.environ["CLOCKIN_BOSS"]
-    me = os.environ["CLOCKIN_ME"]
     term = "\n".join(date_entry.get() for date_entry in dates)
-    self.mail_sbj = string.Template(origin_sbj).safe_substitute({"me": me})
-    self.mail_msg = string.Template(origin_msg).safe_substitute({"boss": boss, "me": me, "term": term})
 
+    # メッセージに文言を埋め込む
+    self.mail_sbj = string.Template(origin_sbj).safe_substitute({"me": self.me})
+    self.mail_msg = string.Template(origin_msg).safe_substitute({"boss": self.boss, "me": self.me, "term": term})
+
+    # 本文確認画面にウィジェットを配置し遷移する
     self.create_checktext_widget()
+    self.frame_checktext.tkraise()
 
-    change_app(self, APP.CHECK)
 
+def send_mail(self, sbj, msg):
+    """
+    受け取った修正済みのメッセージでメール送信ロジックを呼び出す。
 
-def check_text(self):
-
-    logic.send_email(self.mail_sbj, self.mail_msg)
-
-    pass
+    :param self:
+    :param sbj:
+    :param msg:
+    :return:
+    """
+    message = logic.send_email(sbj, msg)
+    self.mail_sbj = ""
+    self.mail_msg = ""
+    messagebox.showinfo("送信結果", message)
+    change_app(self, APP.MAIN)
 
 
 def change_app(self, app):
+    """
+    受け取ったアプリケーションタイプに合わせて単純な画面遷移を行う
+
+    :param self, app:
+    :return:
+    """
     match app:
         case APP.MAIN:
             self.frame.tkraise()

@@ -1,5 +1,7 @@
 # coding: utf-8
 
+import os
+
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkcalendar import DateEntry
@@ -40,24 +42,39 @@ class Window:
         # Initialize y position for date picker placement
         self.date_entry_y = 100
 
+        self.boss = os.environ["CLOCKIN_BOSS"]
+        self.me = os.environ["CLOCKIN_ME"]
+
         self.mail_msg = ""
         self.mail_sbj = ""
 
-
     def add_date_entry(self):
-        # Check if we already have the maximum number of date pickers
+        """最大5個まで、日時選択ウィジェットを追加する
+
+        :return:
+        """
+        # 日時選択ウィジェットのリストの長さを確認する
         if len(self.date_entries) < 5:
-            # Create a new date picker
+
+            # 日時選択ウィジェットを作成・設置
             date_entry = DateEntry(self.frame_applyoff, width=12, background="blue", foreground="white", borderwidth=2)
             date_entry.place(x=40, y=self.date_entry_y)
-            # Increment y position for next date picker
+
+            # 次のウィジェットの位置を下にずらす
             self.date_entry_y += 30
 
-            # Add the date picker to the list
+            # 日時選択ウィジェットをリストに入れる
             self.date_entries.append(date_entry)
 
+    def clear_frame(self, frame):
+        for widget in frame.winfo_children():
+            widget.destroy()
+
     def create_main_frame_widgets(self):
-        """Create widgets for the main frame."""
+        """メインフレームにウィジェットを配置する。
+
+        :return:
+        """
         # ウィジェットの作成
         self.greeting_var.set(logic.greet())
         label_main = ttk.Label(self.frame, textvariable=self.greeting_var)
@@ -72,7 +89,17 @@ class Window:
         clock_off.pack()
 
     def create_applyoff_frame_widgets(self):
-        """Create widgets for the applyoff frame."""
+        """有給申請フレームにウィジェットを配置する
+
+        :return:
+        """
+        # 日時選択ウィジェット追加ボタンを作成・配置
+        add_date_entry_button = tk.Button(self.frame_applyoff, text="+", command=self.add_date_entry)
+        add_date_entry_button.pack()
+
+        # 一つ目の日時選択ウィジェットを配置する
+        self.add_date_entry()
+
         # ウィジェットの作成
         label_applyoff = ttk.Label(self.frame_applyoff, text="有給休暇を申請します")
         button_main = tk.Button(
@@ -82,24 +109,57 @@ class Window:
             self.frame_applyoff, text="申請する",
             command=lambda: route.apply_off(self, self.date_entries))
 
-        # Add date picker addition button
-        add_date_entry_button = tk.Button(self.frame_applyoff, text="+", command=self.add_date_entry)
-        add_date_entry_button.pack()
-
-        # Create initial date entry
-        self.add_date_entry()
-
         # ウィジェットを配置
         label_applyoff.pack()
         button_applyoff.pack()
         button_main.pack()
 
     def create_checktext_widget(self):
-        label_sbj = ttk.Label(self.frame_checktext, text="sbj:" + self.mail_sbj)
-        label_msg = ttk.Label(self.frame_checktext, text="msg:" + self.mail_msg)
+        self.clear_frame(self.frame_checktext)
 
-        label_sbj.pack()
-        label_msg.pack()
+        button_main = tk.Button(
+            self.frame_checktext, text="戻る",
+            command=lambda: route.change_app(self, APP.OFF))
+        button_send = tk.Button(
+            self.frame_checktext, text="送信",
+            command=lambda: route.send_mail(self,
+                                            text_sbj.get("1.0", "end").strip(),
+                                            text_msg.get("1.0", "end").strip()))
+
+        # ------------------------- #
+        # 件名用のテキストウィジェットを作成 #
+        # ------------------------- #
+        # テキストウィジェットを作る
+        text_sbj = tk.Text(self.frame_checktext, wrap=tk.WORD, height=1)
+        text_sbj.insert(tk.END, self.mail_sbj)
+
+        # ------------------------- #
+        # 本文用のテキストフレームを作成 #
+        # ------------------------- #
+        # フレームをインスタンス化
+        text_frame = ttk.Frame(self.frame_checktext)
+        # スクロールバーを作成
+        scrollbar = tk.Scrollbar(text_frame)
+        # Create a Text widget with a vertical scrollbar
+        text_msg = tk.Text(text_frame, wrap=tk.WORD, yscrollcommand=scrollbar.set, height=15)
+        text_msg.insert(tk.END, self.mail_msg)
+        text_msg.pack()
+        # Configure the scrollbar to scroll the Text widget
+        scrollbar.config(command=text_msg.yview)
+
+        # ------------------------- #
+        #  フレーム・ウィジェットを配置  #
+        # ------------------------- #
+        text_sbj.grid(row=0, column=0, sticky='w')
+        text_frame.grid(row=1, column=0, sticky='nsew')
+        text_msg.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        button_main.grid(row=2, column=0, pady=10)
+        button_send.grid(row=3, column=0)
+
+        # Configure grid to be flexible
+        self.frame_checktext.grid_columnconfigure(0, weight=1)
+        self.frame_checktext.grid_rowconfigure(1, weight=1) # Only the text_frame should expand
 
     def show_window(self):
         """Show the window and create the widgets."""
