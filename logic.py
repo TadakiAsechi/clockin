@@ -82,10 +82,12 @@ def get_message(msg_type):
     match msg_type:
         case Message.IN:
             sbj = "出勤報告_${me}"
-            msg = "出勤しましたよ！"
+            msg = "${boss}部長\n\nお疲れ様です。${me}です。\n\n本日${time}に出社いたしましたのでご報告いたします。" \
+                  "\n\n以上、ご確認のほどよろしくお願いいたします。\n\n${me}"
         case Message.OUT:
             sbj = "退勤報告_${me}"
-            msg = "退勤しましたよ！"
+            msg = "${boss}部長\n\nお疲れ様です。${me}です。\n\n本日${time}に退勤いたしますのでご報告いたします。" \
+                  "\n\n以上、ご確認のほどよろしくお願いいたします。\n\n${me}"
         case Message.OFF:
             sbj = "有給申請_${me}"
             msg = "${boss}部長\n\nお疲れ様です。${me}です。\n\n以下の日程で有給休暇を取得させていただきたく思います。\n\n${term} \n" \
@@ -94,3 +96,17 @@ def get_message(msg_type):
             raise ValueError("引数はEnum型Messageから選んでください。")
 
     return sbj, msg
+
+
+def get_quartered_time():
+    now = datetime.now()
+    hour = now.hour
+    min = now.minute
+    min_quarter = min//15
+    time = f"{hour}:{min_quarter*15}"
+
+    return time
+
+def generate_message():
+    pass
+

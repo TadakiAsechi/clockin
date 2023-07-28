@@ -2,6 +2,7 @@
 
 import string
 import os
+from datetime import datetime
 
 from tkinter import messagebox
 
@@ -10,25 +11,29 @@ from conf import Message, APP
 
 
 def clock_in(self):
-    print("you're in!")
+
+    time = logic.get_quartered_time()
     origin_sbj, origin_msg = logic.get_message(Message.IN)
 
     # メッセージに文言を埋め込む
     self.mail_sbj = string.Template(origin_sbj).safe_substitute({"me": self.me})
-    self.mail_msg = string.Template(origin_msg).safe_substitute({"boss": self.boss, "me": self.me})
+    self.mail_msg = string.Template(origin_msg).safe_substitute({"boss": self.boss, "me": self.me, "time": time})
 
-    print("done!")
+    self.create_checktext_widget(app=APP.MAIN)
+    self.frame_checktext.tkraise()
 
 
 def clock_out(self):
-    print("you are out!")
+
+    time = logic.get_quartered_time()
     origin_sbj, origin_msg = logic.get_message(Message.OUT)
 
     # メッセージに文言を埋め込む
     self.mail_sbj = string.Template(origin_sbj).safe_substitute({"me": self.me})
-    self.mail_msg = string.Template(origin_msg).safe_substitute({"boss": self.boss, "me": self.me})
+    self.mail_msg = string.Template(origin_msg).safe_substitute({"boss": self.boss, "me": self.me, "time": time})
 
-    print("Goodbye!")
+    self.create_checktext_widget(app=APP.MAIN)
+    self.frame_checktext.tkraise()
 
 
 def apply_off(self, dates):
@@ -41,7 +46,7 @@ def apply_off(self, dates):
     self.mail_msg = string.Template(origin_msg).safe_substitute({"boss": self.boss, "me": self.me, "term": term})
 
     # 本文確認画面にウィジェットを配置し遷移する
-    self.create_checktext_widget()
+    self.create_checktext_widget(app=APP.OFF)
     self.frame_checktext.tkraise()
 
 

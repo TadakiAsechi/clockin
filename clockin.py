@@ -78,8 +78,8 @@ class Window:
         # ウィジェットの作成
         self.greeting_var.set(logic.greet())
         label_main = ttk.Label(self.frame, textvariable=self.greeting_var)
-        clock_in = tk.Button(self.frame, text="出勤", command=route.clock_in)
-        clock_out = tk.Button(self.frame, text="退勤", command=route.clock_out)
+        clock_in = tk.Button(self.frame, text="出勤", command=lambda:route.clock_in(self))
+        clock_out = tk.Button(self.frame, text="退勤", command=lambda:route.clock_out(self))
         clock_off = tk.Button(self.frame, text="有給申請", command=lambda: route.change_app(self, APP.OFF))
 
         # ウィジェットの設置
@@ -114,12 +114,12 @@ class Window:
         button_applyoff.pack()
         button_main.pack()
 
-    def create_checktext_widget(self):
+    def create_checktext_widget(self, app):
         self.clear_frame(self.frame_checktext)
 
         button_main = tk.Button(
             self.frame_checktext, text="戻る",
-            command=lambda: route.change_app(self, APP.OFF))
+            command=lambda: route.change_app(self, app))
         button_send = tk.Button(
             self.frame_checktext, text="送信",
             command=lambda: route.send_mail(self,
