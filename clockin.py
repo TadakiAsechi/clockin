@@ -76,10 +76,10 @@ class Window:
         :return:
         """
         # ウィジェットの作成
-        self.greeting_var.set(logic.greet())
-        label_main = ttk.Label(self.frame, textvariable=self.greeting_var)
-        clock_in = tk.Button(self.frame, text="出勤", command=lambda:route.clock_in(self))
-        clock_out = tk.Button(self.frame, text="退勤", command=lambda:route.clock_out(self))
+        self.greeting_var.set(logic.generate_message())
+        label_main = ttk.Label(self.frame, wraplength=self.frame["width"], textvariable=self.greeting_var)
+        clock_in = tk.Button(self.frame, text="出勤", command=lambda: route.clock_in(self))
+        clock_out = tk.Button(self.frame, text="退勤", command=lambda: route.clock_out(self))
         clock_off = tk.Button(self.frame, text="有給申請", command=lambda: route.change_app(self, APP.OFF))
 
         # ウィジェットの設置
@@ -162,7 +162,7 @@ class Window:
         self.frame_checktext.grid_rowconfigure(1, weight=1) # Only the text_frame should expand
 
     def show_window(self):
-        """Show the window and create the widgets."""
+
         self.create_main_frame_widgets()
         self.create_applyoff_frame_widgets()
 

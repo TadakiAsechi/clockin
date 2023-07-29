@@ -2,22 +2,15 @@
 
 import ssl
 import os
+import random
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.header import Header
 
 import smtplib
+import openai
 
 from conf import Email, Message
-
-
-def greet():
-    time = datetime.now()
-    print(f"now, it's {time} o'clock!")
-    msg = "Morning!"
-    
-    return msg
 
 
 def send_email(sbj, msg):
@@ -107,6 +100,31 @@ def get_quartered_time():
 
     return time
 
-def generate_message():
-    pass
 
+def generate_message():
+    openai.api_key = os.environ["CLOCKIN_OPENAI_API_KEY"]
+    now = datetime.now()
+    hour = now.hour
+
+    rand = random.randint(1, 3)
+
+    match rand:
+        case 1:
+            prompt = f"Now time is {hour}. I'm at office. greet me in nice way."
+        case 2:
+            prompt = f"Give me a insightful quote."
+        case 3:
+            prompt = f"Give me a fun fact."
+        case _:
+            prompt = f"Just echo this: 'Unexpected number was chosen.'"
+
+    res = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "user", "content": prompt }
+        ]
+    )
+
+    message = content = res['choices'][0]['message']['content']
+
+    return message
