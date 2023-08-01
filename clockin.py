@@ -1,6 +1,9 @@
 # coding: utf-8
 
 import os
+import time
+from datetime import datetime
+import threading
 
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -48,6 +51,10 @@ class Window:
         self.mail_msg = ""
         self.mail_sbj = ""
 
+        self.last_message_time = None
+        self.thread = threading.Thread(target=self.update_message)
+        self.thread.start()
+
     def add_date_entry(self):
         """最大5個まで、日時選択ウィジェットを追加する
 
@@ -77,7 +84,9 @@ class Window:
         """
         # ウィジェットの作成
         self.greeting_var.set(logic.generate_message())
-        label_main = ttk.Label(self.frame, wraplength=self.frame["width"], textvariable=self.greeting_var)
+        label_main = ttk.Label(self.frame, wraplength=350, textvariable=self.greeting_var)
+        self.last_message_time = datetime.now()
+
         clock_in = tk.Button(self.frame, text="出勤", command=lambda: route.clock_in(self))
         clock_out = tk.Button(self.frame, text="退勤", command=lambda: route.clock_out(self))
         clock_off = tk.Button(self.frame, text="有給申請", command=lambda: route.change_app(self, APP.OFF))
@@ -171,6 +180,15 @@ class Window:
 
         # 表示
         self.root.mainloop()
+
+    def update_message(self):
+        while True:
+            if self.last_message_time is not None and (datetime.now() - self.last_message_time).seconds >= 600:
+                self.greeting_var.set(logic.generate_message())
+                print(self.greeting_var)
+                self.last_message_time = datetime.now()
+
+            time.sleep(60)
 
 
 if __name__ == "__main__":

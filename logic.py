@@ -4,6 +4,9 @@ import ssl
 import os
 import random
 from datetime import datetime
+import time
+
+import tkinter.ttk as ttk
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -118,13 +121,16 @@ def generate_message():
         case _:
             prompt = f"Just echo this: 'Unexpected number was chosen.'"
 
+    # メッセージがランダム性を高くするため、temperatureを高めに設定する。
     res = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
+        temperature=1.5,
         messages=[
             {"role": "user", "content": prompt }
         ]
     )
 
-    message = content = res['choices'][0]['message']['content']
+    message = res['choices'][0]['message']['content']
 
     return message
+
