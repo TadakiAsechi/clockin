@@ -1,8 +1,10 @@
-import dataclasses
+# coding: utf-8
+
+from dataclasses import dataclass, field
 import enum
 
 
-@dataclasses.dataclass
+@dataclass
 class Email:
     # server
     smtp_server: str
@@ -11,6 +13,7 @@ class Email:
     password: str
     # message
     to: str = ""
+    cc: list = field(default_factory=list)
     subject: str = ""
     body: str = ""
 
@@ -18,6 +21,7 @@ class Email:
 class APP(enum.Enum):
     MAIN = 0
     OFF = 1
+    CHECK = 2
 
 
 class Message(enum.Enum):
