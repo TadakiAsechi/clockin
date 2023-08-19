@@ -28,3 +28,9 @@ class Message(enum.Enum):
     IN = 1
     OUT = 2
     OFF = 3
+
+
+class MailResult(enum.Enum):
+    SUCCESS = (0, "送信に成功しました。")
+    CONNECTIONERROR = (1, "コネクションに失敗しました。")
+    EXCEPTION = (2, f"エラーが発生しました。")

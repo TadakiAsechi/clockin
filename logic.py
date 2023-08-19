@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 import smtplib
 import openai
 
-from conf import Email, Message
+from conf import Email, Message, MailResult
 
 
 def send_email(sbj, msg):
@@ -62,12 +62,12 @@ def send_email(sbj, msg):
         server.sendmail(email.username, email.to, message.as_string())
     except (OSError, ConnectionRefusedError) as e:
         print("Connection failed: ", e)
-        result = "コネクションに失敗しました。"
+        result = MailResult.CONNECTIONERROR
     except Exception as e:
         print(type(e), e)
-        result = f"エラーが発生しました:{type(e)}"
+        result = MailResult.EXCEPTION
     else:
-        result = "送信に成功しました。"
+        result = MailResult.SUCCESS
     finally:
         server.quit()
 
