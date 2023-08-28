@@ -4,9 +4,7 @@ import ssl
 import os
 import random
 from datetime import datetime
-import time
 
-import tkinter.ttk as ttk
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
