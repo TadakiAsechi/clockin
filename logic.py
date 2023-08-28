@@ -15,7 +15,6 @@ import openai
 
 from conf import Email, Message
 
-
 def send_email(sbj, msg):
     """引数の内容でメールを上司に送る
 
@@ -38,7 +37,9 @@ def send_email(sbj, msg):
 
     # メッセージを詰める
     email.to = os.environ["CLOCKIN_BOSSMAIL"]
-    email.cc.append(os.environ["CLOCKIN_USERNAME"])
+
+    cc_list = [item.strip() for item in os.environ["CLOCKIN_CC"].split(",")]
+    email.cc.extend(cc_list)
 
     email.subject = sbj
     email.body = msg
@@ -50,7 +51,7 @@ def send_email(sbj, msg):
     message = MIMEMultipart()
     message["From"] = email.username
     message["To"] = email.to
-    message["CC"] = ",".join(email.cc)
+    message["CC"] = ", ".join(cc_list)
     message["Subject"] = email.subject
     message.attach(MIMEText(email.body, "plain"))
 
@@ -59,7 +60,9 @@ def send_email(sbj, msg):
         server = smtplib.SMTP_SSL(email.smtp_server, email.port, context=context, timeout=10)
         server.ehlo()
         server.login(email.username, email.password)
-        server.sendmail(email.username, email.to, message.as_string())
+        send_list = email.cc
+        send_list.append(email.to)
+        server.sendmail(email.username, send_list, message.as_string())
     except (OSError, ConnectionRefusedError) as e:
         print("Connection failed: ", e)
         result = "コネクションに失敗しました。"
