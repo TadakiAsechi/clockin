@@ -65,7 +65,7 @@ def send_mail(self, sbj, msg):
     self.mail_msg = ""
     messagebox.showinfo("送信結果", message)
 
-    if ret_val == MailResult.SUCSESS:
+    if ret_val == MailResult.SUCCESS:
         #TODO:  成功時はExcelに記録を行う
         pass
     else:
